@@ -1,5 +1,6 @@
 import re
 from urllib import response
+import random
 
 # Functions go here
 
@@ -33,17 +34,15 @@ def not_blank(question, error_message):
         else:
             print(error_message)
 
-# Encrypt or Decrypt
-def encrypt_decrypt(question):
-
-    to_check = ["encrypt","decrypt"]
+# Check if the choice is valid
+def choices_checker(question, choices):
 
     valid = False
     while not valid:
 
         response = input(question).lower()
 
-        for var_item in to_check:
+        for var_item in choices:
             if response == var_item:
                 return response
             elif response == var_item[0]:
@@ -51,34 +50,56 @@ def encrypt_decrypt(question):
 
         print("Please enter either encrypt or decrypt.\n")
 
-# Key
+# Ask for key
 def ask_key(question):
 
-    to_check = ["1","2","3","4","5","6","7","8","9","10","11","12","13","14","16","17","18","19","20","21","22","23","24","25"]
+    error = "Please enter a whole number between 1 and 25"
 
     valid = False
     while not valid:
-
-        response = input(question).lower()
-
-        for var_item in to_check:
-            if response == var_item:
+        
+        # ask user for number and check it is valid
+        try:
+            response = int(input(question))
+            
+            if response <= 0:
+                print(error)
+            else:
                 return response
-            elif response == var_item[0]:
-                return var_item
+            
+            if 1 <= response <= 25:
+                return response
+            else:
+                print(error)
+            
+        except ValueError:
+            print(error)
 
-        print("Please choose a valid key ranging from 1-25\n")
+# Encrypting Text
+def encrypt(text, shift):
+    encrypted_text = ''
+    for i in range(len(text)):
+        if text[i] == ' ':
+            encrypted_text = encrypted_text + text[i]
+        elif text[i].isupper():
+            encrypted_text = encrypted_text + chr((ord(text[i])+shift-65)%26+65)
+        else:
+            encrypted_text = encrypted_text + chr((ord(text[i])+shift-97)%26+97)
+    return encrypted_text
 
-# Cipher Text
-def cypher(target, shift):
-    for index in range(len(alphabet)):
-        if alphabet[index] == target:
-            x = index + shift
-            y =  x % len(alphabet)
-            return (alphabet[y])
-
+# Decrypting Text
+def decrypt(encrypt_text, shift):
+    decrypted_text = ''
+    for i in range(len(encrypt_text)):
+        if encrypt_text[i] == ' ':
+            decrypted_text = decrypted_text + encrypt_text[i]
+        elif encrypt_text[i].isupper():
+            decrypted_text = decrypted_text + chr((ord(encrypt_text[i])-shift-65)%26+65)
+        else:
+            decrypted_text = decrypted_text + chr((ord(encrypt_text[i])-shift-97)%26+97)
+    return decrypted_text
+    
 # Main Routine goes here
-alphabet = "abcdefghijklmopqrstuvwxyz"
 
 # Ask for Instructions
 want_help = yes_no("Do you want to read the instructions?")
@@ -98,20 +119,34 @@ else:
 # Ask user to input a message
 main_text = not_blank("Input the text: ", "Please enter a valid text")
 
+
 # Ask user if they want to decrypt or encrypt the message.
-method = encrypt_decrypt("Do you want to decrypt or encrypt the text?")
+to_check = ["encrypt","decrypt"]
+method = choices_checker("Do you want to decrypt or encrypt the text?", to_check)
 
-if method == "decrypt":
-    print("You have chose to decrypt the message.\n")    
-    shift = ask_key("Please input the key you desire")
+# Ask user for a key
+want_key = yes_no("Do you want to let the program generate a random key for you?")
 
+if want_key == "no":
+    shift = ask_key("Please input the key you desire: ")
     print("Your key is {}".format(shift))
-    encrypted_string = ""
-    for x in main_text:
-        if x == ' ':
-            encrypted_string += ' '
-        else:
-            encrypted_string += cypher(x, shift)
+else:
+    # Generate a random key from 1 - 25
+    shift= random.randint(1,25)
+    print("The program chose {}".format(shift))
 
-    print("This is the text:\n{}".format(encrypted_string))
 
+
+# If user chose to decrypt the text
+if method == "decrypt":
+    print("You have chose to decrypt the message.\n")
+    print("Decrypting this text: --{}--".format(main_text))
+    decrypt_text = decrypt(main_text, shift)
+    print("Decrypted text: {}".format(decrypt_text))
+
+# If user chose to encrypt the text
+elif method == "encrypt":
+    print("You have chose to encrypt the message.\n")
+    print("Encrypting this text: {}".format(main_text))
+    encrypted_text = encrypt(main_text, shift)
+    print("Encrypted text: {}".format(encrypted_text))
