@@ -1,10 +1,7 @@
 # want_instructions
 
 # Yes/No Checker
-def yes_no(question):
-
-    to_check = ["yes","no"]
-
+def string_checker(question, to_check, error_message):
     valid = False
     while not valid:
 
@@ -16,11 +13,11 @@ def yes_no(question):
             elif response == var_item[0]:
                 return var_item
 
-        print("Please enter either yes or no...\n")
+        print(error_message)
 
 # Ask for Instructions
 for item in range(0, 6):
-    want_help = yes_no("Do you want to read the instructions?")
+    want_help = string_checker("Do you want to read the instructions?", ["yes", "no"], "Please enter either a yes / no")
 
     # Outputs instructions or skips it.
     if want_help == "yes":

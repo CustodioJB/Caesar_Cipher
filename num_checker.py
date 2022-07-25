@@ -1,7 +1,7 @@
-# Check if the number is valid
+
 from numpy import number
 
-
+# Check if the number is valid
 def number_checker(question):
 
     error = "Please enter a whole number between 1 and 25"
